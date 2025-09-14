@@ -50,12 +50,12 @@ function stringOperation(inputString) {
   }
   console.log(operator);
 }
-console.log(stringOperation("10 + 10"));
-console.log(stringOperation("20-5"));
-console.log(stringOperation("8*3"));
-console.log(stringOperation("100 / 20"));
+console.log(stringOperation("10 + 10/2"));
+// console.log(stringOperation("20-5"));
+// console.log(stringOperation("8*3"));
+// console.log(stringOperation("100 / 20"));
 
-console.log(stringOperation(""));
-console.log(stringOperation("100"));
-console.log(stringOperation("10/0"));
-console.log(stringOperation("10 + a"));
+// console.log(stringOperation(""));
+// console.log(stringOperation("100"));
+// console.log(stringOperation("10/0"));
+// console.log(stringOperation("10 + a"));
