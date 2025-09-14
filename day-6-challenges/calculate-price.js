@@ -9,14 +9,9 @@
 const priceTable = require("./store-product-list (1).json");
 
 const groceryList = [
-  { item: "Jam - Apricot", quantity: 2 },
-  { item: "Creamers - 10%", quantity: 1 },
-  // { item: "Jam - Apricot", quantity: 10 },
+  { item: "Jam - Apricot", quantity: 4 },
+  { item: "Creamers - 10%", quantity: 2 },
 ];
-
-const finalBill = {};
-let totalPrice = 0;
-let priceWithoutDollor = 0;
 
 function getTotalAmount(priceTable) {
   if (!Array.isArray(priceTable) || !Array.isArray(groceryList)) {
@@ -25,28 +20,53 @@ function getTotalAmount(priceTable) {
     );
     return [];
   }
-  for (let i = 0; i < groceryList.length; i++) {
-    let itemName = groceryList[i].item;
-    for (let j = 0; j < priceTable.length; j++) {
-      let priceWithoutDollor = priceTable[j].price.replace("$", "");
-      if (priceTable[j].product === itemName) {
-        if (groceryList[i].quantity <= priceTable[j].Quantity) {
-          totalPrice = priceWithoutDollor * groceryList[i].quantity;
-          console.log(priceWithoutDollor);
-          finalBill[groceryList[i].item] = totalPrice;
-        } else {
-          totalPrice = priceWithoutDollor * priceTable[j].Quantity;
+  if (groceryList.length === 0) {
+    console.error("no items added");
+    return [];
+  }
+  const groceryFinal = {};
+  let totalPrice = 0;
+  for (let k = 0; k < groceryList.length; k++) {
+    let entry = groceryList[k];
+    if (!("item" in entry) || !("quantity" in entry)) {
+      console.error("invalid grocery entry");
+      return null;
+    }
+    if (typeof entry.item !== "string" || typeof entry.quantity !== "number") {
+      console.error("invalid type in the input");
+      return null;
+    }
 
-          console.log(typeof priceTable[j].price);
-          console.log(priceWithoutDollor);
-          console.log(priceTable[j].Quantity);
-          console.log(totalPrice);
-          finalBill[groceryList[i].item] = totalPrice;
-        }
-      }
+    let item = groceryList[k].item;
+    let quantity = groceryList[k].quantity;
+
+    if (groceryFinal[item] === undefined) {
+      groceryFinal[item] = quantity;
+    } else {
+      groceryFinal[item] += quantity;
     }
   }
-  console.log(finalBill);
+
+  for (let item in groceryFinal) {
+    let productFound = false;
+    for (let i = 0; i < priceTable.length; i++) {
+      if (priceTable[i].product === item) {
+        productFound = true;
+        if (priceTable[i].Quantity >= groceryFinal[item]) {
+          let priceWithoutDollar = priceTable[i].price.replace("$", "");
+          totalPrice += priceWithoutDollar * groceryFinal[item];
+        } else {
+          let priceWithoutDollar = priceTable[i].price.replace("$", "");
+          totalPrice += priceWithoutDollar * priceTable[i].Quantity;
+        }
+        break;
+      }
+    }
+    if (!productFound) {
+      return "invalid product selected";
+    }
+  }
+  return `$${totalPrice}`;
 }
 
-getTotalAmount(priceTable);
+console.log(getTotalAmount(priceTable));
