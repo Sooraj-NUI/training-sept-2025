@@ -50,7 +50,7 @@ function stringOperation(inputString) {
   }
   console.log(operator);
 }
-console.log(stringOperation("10 + 10/2"));
+console.log(stringOperation("10 + 10"));
 // console.log(stringOperation("20-5"));
 // console.log(stringOperation("8*3"));
 // console.log(stringOperation("100 / 20"));
