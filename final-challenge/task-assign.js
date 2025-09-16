@@ -332,78 +332,13 @@ function findTaskWithSameTitle(todos) {
 }
 console.log(findTaskWithSameTitle(todos));
 
-// function sortPriorityWise(todos) {
-//   const highPriority = [];
-//   const mediumPriority = [];
-//   const lowPriority = [];
 
-//   todos.map((todo) => {
-//     if (
-//       todo.priority.toLowerCase() === "high" &&
-//       todo.status.toLowerCase() !== "done" &&
-//       todo.status.toLowerCase() !== "blocked"
-//     ) {
-//       highPriority.push(todo);
-//     }
-//     if (
-//       todo.priority.toLowerCase() === "medium" &&
-//       todo.status.toLowerCase() !== "done" &&
-//       todo.status.toLowerCase() !== "blocked"
-//     ) {
-//       mediumPriority.push(todo);
-//     }
-//     if (
-//       todo.priority.toLowerCase() === "low" &&
-//       todo.status.toLowerCase() !== "done" &&
-//       todo.status.toLowerCase() !== "blocked"
-//     ) {
-//       lowPriority.push(todo);
-//     }
-//   });
-//   console.log(highPriority);
-//   console.log(mediumPriority);
-//   console.log(lowPriority);
-
-//   const startable = [];
-//   highPriority.map((t) => { if (canStart(t)) startable.push(t); });
-//   mediumPriority.map((t) => { if (canStart(t)) startable.push(t); });
-//   lowPriority.map((t) => { if (canStart(t)) startable.push(t); });
-//   startable.sort((a, b) => {
-//     const priorityOrder = { high: 1, medium: 2, low: 3 };
-//     let prioDiff = priorityOrder[a.priority.toLowerCase()] - priorityOrder[b.priority.toLowerCase()];
-//     if (prioDiff !== 0) return prioDiff;
-
-//     let dueDiff = new Date(a.due) - new Date(b.due);
-//     if (dueDiff !== 0) return dueDiff;
-
-//     return a.estimateHrs - b.estimateHrs;
-//   });
-//   return startable.map((t) => t.id);
-// }
-// console.log(sortPriorityWise(todos));
-
-//  function canStart(task) {
-//     if (!task.dependsOn || task.dependsOn.length === 0) {
-//       return true;
-//     }
-
-//     for (let i = 0; i < task.dependsOn.length; i++) {
-//       let depId = task.dependsOn[i];
-//       let depTask = todos.find((t) => t.id === depId);
-//       if (depTask && depTask.status.toLowerCase() !== "done") {
-//         return false;
-//       }
-//     }
-
-//     return true;
-//   }
 
 function sortPriorityWise(todos) {
   const highPriority = [];
   const mediumPriority = [];
   const lowPriority = [];
 
-  // helper inside so it can see todos
   function canStart(task) {
     if (!task.dependsOn || task.dependsOn.length === 0) {
       return true;
