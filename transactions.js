@@ -207,8 +207,15 @@ const transactionDetails = {
 };
 
 function findEligibleCouponForSuccessTransaction(transactionData) {
-  const coupons = transactionData.coupons;
-  const transactions = transactionData.transactions;
+  let coupons = [];
+  let transactions = [];
+
+  if (Array.isArray(transactionData.coupons)) {
+    coupons = transactionData.coupons;
+  }
+  if (Array.isArray(transactionData.transactions)) {
+    transactions = transactionData.transactions;
+  }
 
   const successfulTransactions = transactions.filter(
     (data) => data.status.toLowerCase() === "success"
@@ -218,6 +225,7 @@ function findEligibleCouponForSuccessTransaction(transactionData) {
     const transactionDate = new Date(transaction.ts);
     const eligibleCoupons = transaction.couponCodes.filter((code) => {
       const coupon = coupons.find((coupon) => coupon.code === code);
+      if (!coupon) return false;
 
       const validFrom = new Date(coupon.validFrom);
       const validTo = new Date(coupon.validTo);
@@ -259,7 +267,7 @@ function findEligibleCouponForSuccessTransaction(transactionData) {
 
     return {
       txId: transaction.id,
-      choosenCoupon: bestCoupon,
+      chosenCoupon: bestCoupon,
       discount: bestDiscount,
       net: netAmount,
     };
@@ -269,8 +277,15 @@ function findEligibleCouponForSuccessTransaction(transactionData) {
 console.log(findEligibleCouponForSuccessTransaction(transactionDetails));
 
 function findTicketStatus(transactionData) {
+  if (!transactionData || typeof transactionData !== "object") {
+    console.error("Invalid transaction data");
+    return [];
+  }
   const result = [];
-  const tickets = transactionData.tickets;
+  let tickets = [];
+  if (Array.isArray(transactionData.tickets)) {
+    tickets = transactionData.tickets;
+  }
   const metaData = transactionData.metaData;
   const ticketsWithStatusOpen = tickets.filter(
     (ticket) => ticket.status.toLowerCase() === "open"
