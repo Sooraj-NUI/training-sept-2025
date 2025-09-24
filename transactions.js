@@ -1,5 +1,5 @@
 const transactionDetails = {
-  meta: {
+  metaData: {
     asOf: "2025-09-15T12:00:00+05:30",
     currency: "INR",
     timezone: "Asia/Kolkata",
@@ -207,14 +207,12 @@ const transactionDetails = {
 };
 
 function findEligibleCouponForSuccessTransaction(transactionData) {
-  const users = transactionData.users;
   const coupons = transactionData.coupons;
   const transactions = transactionData.transactions;
 
   const successfulTransactions = transactions.filter(
     (data) => data.status.toLowerCase() === "success"
   );
-
 
   const result = successfulTransactions.map((transaction) => {
     const transactionDate = new Date(transaction.ts);
@@ -225,9 +223,9 @@ function findEligibleCouponForSuccessTransaction(transactionData) {
       const validTo = new Date(coupon.validTo);
 
       const enoughAmount = transaction.amount >= coupon.minOrder;
-      const validdate =
+      const validDate =
         transactionDate >= validFrom && transactionDate <= validTo;
-      if (enoughAmount && validdate) {
+      if (enoughAmount && validDate) {
         return true;
       }
     });
@@ -238,13 +236,13 @@ function findEligibleCouponForSuccessTransaction(transactionData) {
     eligibleCoupons.forEach((code) => {
       const coupon = coupons.find((coupon) => coupon.code === code);
       let discount = 0;
-
-      if (coupon.type === "percent") {
+      const couponType = coupon.type.toLowerCase();
+      if (couponType === "percent") {
         discount = transaction.amount * (coupon.value / 100);
         if (discount > coupon.maxDiscount) {
           discount = coupon.maxDiscount;
         }
-      } else if (coupon.type === "flat") {
+      } else if (couponType === "flat") {
         if (coupon.value >= coupon.maxDiscount) {
           discount = coupon.maxDiscount;
         } else if (coupon.value < coupon.maxDiscount) {
@@ -260,7 +258,7 @@ function findEligibleCouponForSuccessTransaction(transactionData) {
     const netAmount = transaction.amount - bestDiscount;
 
     return {
-      txid: transaction.id,
+      txId: transaction.id,
       choosenCoupon: bestCoupon,
       discount: bestDiscount,
       net: netAmount,
@@ -273,38 +271,37 @@ console.log(findEligibleCouponForSuccessTransaction(transactionDetails));
 function findTicketStatus(transactionData) {
   const result = [];
   const tickets = transactionData.tickets;
-  const meta = transactionData.meta;
+  const metaData = transactionData.metaData;
   const ticketsWithStatusOpen = tickets.filter(
-    (ticket) => ticket.status === "open"
+    (ticket) => ticket.status.toLowerCase() === "open"
   );
 
   ticketsWithStatusOpen.forEach((item) => {
-    if (item.status.toLowerCase() === "open") {
-      const created = item.created;
+    const created = item.created;
+    const ended = metaData.asOf;
 
-      let startDate = new Date(created);
-      let endDate = new Date(meta.asOf);
+    let startDate = new Date(created);
+    let endDate = new Date(ended);
 
-      if (startDate.getTime() < endDate.getTime()) {
-        endDate = new Date(created);
-        startDate = new Date(meta.asOf);
-      }
-      const differenceInMinutes = startDate.getTime() - endDate.getTime();
-
-      const differenceInHours = Math.round(differenceInMinutes / (1000 * 60 * 60));
-
-      if (differenceInHours > 40) {
-        result.push({
-          ticketId: item.id,
-          ageHours: differenceInHours,
-          status: "breach",
-        });
-      } else {
-        result.push({
-          ticketId: item.id,
-          ageHours: differenceInHours,
-        });
-      }
+    if (startDate.getTime() < endDate.getTime()) {
+      endDate = new Date(created);
+      startDate = new Date(metaData.asOf);
+    }
+    const differenceInMinutes = startDate.getTime() - endDate.getTime();
+    const differenceInHours = Math.round(
+      differenceInMinutes / (1000 * 60 * 60)
+    );
+    if (differenceInHours > 40) {
+      result.push({
+        ticketId: item.id,
+        ageHours: differenceInHours,
+        status: "breach",
+      });
+    } else {
+      result.push({
+        ticketId: item.id,
+        ageHours: differenceInHours,
+      });
     }
   });
   return result;
