@@ -332,8 +332,6 @@ function findTaskWithSameTitle(todos) {
 }
 console.log(findTaskWithSameTitle(todos));
 
-
-
 function sortPriorityWise(todos) {
   const highPriority = [];
   const mediumPriority = [];
@@ -478,25 +476,25 @@ function reassignBasedOnCapacity(todos, people) {
 }
 console.log(reassignBasedOnCapacity(todos, people));
 
-
 function checkDependency(todos) {
-  dependencyids = [];
+  dependencyids = {};
   todos.map((item) => {
     if (item.dependsOn !== undefined && item.status.toLowerCase() === "todo") {
-      dependencyids.push(item);
+      dependencyids[item.id] = item.dependsOn;
     }
   });
 
-  dependencyids.map((item) => {
-    let stack = [item.id];
-    item.dependsOn.map((depId) => {
-      let depTask = todos.find((t) => t.id === depId);
-      if (depTask) {
-        if (stack.includes(depTask.id)) {
-            return [...stack, depTask.id];
-        }
+  let keys = Object.keys(dependencyids);
+  let result = [];
+  for (const key in dependencyids) {
+    for (const val of dependencyids[key]) {
+      if (val === key) {
+        result.push(key);
+      } else if (dependencyids[val] && dependencyids[val].includes(key)) {
+        result.push(key);
       }
-    });
-  });
+    }
+  }
+  return result;
 }
 console.log(checkDependency(todos));
