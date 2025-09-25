@@ -297,8 +297,6 @@ function findTicketStatus(transactionData) {
 
     let startDate = new Date(created);
     let endDate = new Date(ended);
-    let startTime = startDate.getTime();
-    let endTime = endDate.getTime();
 
     if (startDate.getTime() < endDate.getTime()) {
       endDate = new Date(created);
