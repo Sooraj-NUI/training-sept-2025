@@ -297,16 +297,18 @@ function findTicketStatus(transactionData) {
 
     let startDate = new Date(created);
     let endDate = new Date(ended);
+    let startTime = startDate.getTime();
+    let endTime = endDate.getTime();
 
     if (startDate.getTime() < endDate.getTime()) {
       endDate = new Date(created);
-      startDate = new Date(metaData.asOf);
+      startDate = new Date(ended);
     }
     const differenceInMinutes = startDate.getTime() - endDate.getTime();
     const differenceInHours = Math.round(
       differenceInMinutes / (1000 * 60 * 60)
     );
-    if (differenceInHours > 40) {
+    if (differenceInHours > 48) {
       result.push({
         ticketId: item.id,
         ageHours: differenceInHours,
