@@ -243,36 +243,42 @@ function findEligibleCouponForSuccessTransaction(transactionData) {
 
     eligibleCoupons.forEach((code) => {
       const coupon = coupons.find((coupon) => coupon.code === code);
-      let discount = 0;
+      let maximumDiscount = 0;
       const couponType = coupon.type.toLowerCase();
       if (couponType === "percent") {
-        discount = transaction.amount * (coupon.value / 100);
-        if (discount > coupon.maxDiscount) {
-          discount = coupon.maxDiscount;
+        maximumDiscount = transaction.amount * (coupon.value / 100);
+        if (maximumDiscount > coupon.maxDiscount) {
+          maximumDiscount = coupon.maxDiscount;
         }
       } else if (couponType === "flat") {
         if (coupon.value >= coupon.maxDiscount) {
-          discount = coupon.maxDiscount;
+          maximumDiscount = coupon.maxDiscount;
         } else if (coupon.value < coupon.maxDiscount) {
           discount = coupon.value;
         }
       }
-      if (discount > bestDiscount) {
-        bestDiscount = discount;
+      if (maximumDiscount > bestDiscount) {
+        bestDiscount = maximumDiscount;
         bestCoupon = code;
       }
     });
 
     const netAmount = transaction.amount - bestDiscount;
-
-    return {
-      txId: transaction.id,
-      chosenCoupon: bestCoupon,
-      discount: bestDiscount,
-      net: netAmount,
-    };
+    if (bestCoupon) {
+      return {
+        txId: transaction.id,
+        chosenCoupon: bestCoupon,
+        discount: bestDiscount,
+        net: netAmount,
+      };
+    }
+    return undefined;
   });
-  return result;
+  return result.filter((item) => {
+    if (item) {
+      return item;
+    }
+  });
 }
 console.log(findEligibleCouponForSuccessTransaction(transactionDetails));
 
